@@ -237,7 +237,9 @@ static CHAR16 *ReadLine(REFIT_FILE *File)
 // Returns FALSE if *p points to the end of a token, TRUE otherwise.
 // Also modifies *p **IF** the first and second characters are both
 // quotes ('"'); it deletes one of them.
-static BOOLEAN KeepReading(IN OUT CHAR16 *p, IN OUT BOOLEAN *IsQuoted) {
+static BOOLEAN KeepReading(IN OUT CHAR16 *p, IN OUT BOOLEAN *IsQuoted, IN CHAR16
+        QuoteChar)
+{
    BOOLEAN MoreToRead = FALSE;
    CHAR16  *Temp = NULL;
 
@@ -250,8 +252,8 @@ static BOOLEAN KeepReading(IN OUT CHAR16 *p, IN OUT BOOLEAN *IsQuoted) {
    if ((*p != ' ' && *p != '\t' && *p != '=' && *p != '#' && *p != ',') || *IsQuoted) {
       MoreToRead = TRUE;
    }
-   if (*p == L'"') {
-      if (p[1] == L'"') {
+   if (*p == QuoteChar) {
+      if (p[1] == QuoteChar) {
          Temp = StrDuplicate(&p[1]);
          if (Temp != NULL) {
             StrCpy(p, Temp);
@@ -273,7 +275,7 @@ static BOOLEAN KeepReading(IN OUT CHAR16 *p, IN OUT BOOLEAN *IsQuoted) {
 UINTN ReadTokenLine(IN REFIT_FILE *File, OUT CHAR16 ***TokenList)
 {
     BOOLEAN         LineFinished, IsQuoted = FALSE;
-    CHAR16          *Line, *Token, *p;
+    CHAR16          *Line, *Token, QuoteChar, *p;
     UINTN           TokenCount = 0;
 
     *TokenList = NULL;
@@ -292,14 +294,15 @@ UINTN ReadTokenLine(IN REFIT_FILE *File, OUT CHAR16 ***TokenList)
             if (*p == 0 || *p == '#')
                 break;
 
-            if (*p == '"') {
+            if (*p == '"' || *p == '\'') {
                IsQuoted = !IsQuoted;
+               QuoteChar = *p;
                p++;
             } // if
             Token = p;
 
             // find end of token
-            while (KeepReading(p, &IsQuoted)) {
+            while (KeepReading(p, &IsQuoted, QuoteChar)) {
                if ((*p == L'/') && !IsQuoted) // Switch Unix-style to DOS-style directory separators
                   *p = L'\\';
                p++;
