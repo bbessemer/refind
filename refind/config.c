@@ -3,6 +3,7 @@
  * Configuration file functions
  *
  * Copyright (c) 2006 Christoph Pfisterer
+ * Minor edits (c) 2020 Brent Bessemer
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -237,8 +238,8 @@ static CHAR16 *ReadLine(REFIT_FILE *File)
 // Returns FALSE if *p points to the end of a token, TRUE otherwise.
 // Also modifies *p **IF** the first and second characters are both
 // quotes ('"'); it deletes one of them.
-static BOOLEAN KeepReading(IN OUT CHAR16 *p, IN OUT BOOLEAN *IsQuoted, IN CHAR16
-        QuoteChar)
+static BOOLEAN KeepReading(IN OUT CHAR16 *p, IN OUT BOOLEAN *IsQuoted,
+                           IN CHAR16 QuoteChar)
 {
    BOOLEAN MoreToRead = FALSE;
    CHAR16  *Temp = NULL;
